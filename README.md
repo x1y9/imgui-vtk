@@ -8,7 +8,7 @@
 ![](vtkImGuiDemo.gif)
 
 ## Usage:
-- Build VTK, if static, set VTK_SMP_ENABLE_STDTHREAD=OFF
+- Build VTK 9.3.1, if static, set VTK_SMP_ENABLE_STDTHREAD=OFF
 - CMake
   1. Build separately & link
     - Build your executable, imgui, your OpenGL Loader (e.g., gl3w), and imgui-vtk. **Make sure to link imgui-vtk against imgui, your OpenGL Loader (e.g., gl3w), and VTK!**

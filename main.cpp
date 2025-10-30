@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
+  io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 22.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
 
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(window, true);
