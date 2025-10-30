@@ -61,6 +61,7 @@ public:
 	IMGUI_IMPL_API void addActor(const vtkSmartPointer<vtkProp>& actor);
 	IMGUI_IMPL_API void addActors(const vtkSmartPointer<vtkPropCollection>& actors);
 	IMGUI_IMPL_API void removeActor(const vtkSmartPointer<vtkProp>& actor);
+	IMGUI_IMPL_API void cleanup();
 	void setViewportSize(const ImVec2 newSize);
 public:
 	static inline unsigned int NoScrollFlags(){

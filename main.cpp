@@ -34,9 +34,6 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int argc, char* argv[])
 {
-  // Setup pipeline
-  auto actor = SetupDemoPipeline();
-
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()){
@@ -75,9 +72,9 @@ int main(int argc, char* argv[])
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows'
+  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows'
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
@@ -88,6 +85,7 @@ int main(int argc, char* argv[])
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   // Initialize VtkViewer objects
+  auto actor = SetupDemoPipeline();
   VtkViewer vtkViewer1;
   vtkViewer1.addActor(actor);
 
@@ -238,7 +236,11 @@ int main(int argc, char* argv[])
     glfwSwapBuffers(window);
   }
 
-  // Cleanup
+  // Cleanup VTK viewers first
+  vtkViewer1.cleanup();
+  vtkViewer2.cleanup();
+
+  // Then cleanup ImGui and GLFW
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();

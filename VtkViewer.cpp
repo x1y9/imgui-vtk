@@ -101,12 +101,38 @@ VtkViewer::VtkViewer(VtkViewer&& vtkViewer) noexcept
 }
 
 VtkViewer::~VtkViewer(){
+	cleanup();
+}
+
+void VtkViewer::cleanup(){
+	// Clean up VTK objects in proper order
+	if (renderer) {
+		renderer->RemoveAllViewProps();
+	}
+	
+	if (interactor) {
+		interactor->SetInteractorStyle(nullptr);
+		interactor->SetRenderWindow(nullptr);
+	}
+	
+	if (renderWindow) {
+		if (renderer) {
+			renderWindow->RemoveRenderer(renderer);
+		}
+		renderWindow->Finalize();
+	}
+
+	// Release smart pointers
 	renderer = nullptr;
-	interactorStyle = nullptr;
 	interactor = nullptr;
+	interactorStyle = nullptr;
 	renderWindow = nullptr;
 
-	glDeleteTextures(1, &tex);
+	// Clean up OpenGL texture
+	if (tex != 0) {
+		glDeleteTextures(1, &tex);
+		tex = 0;
+	}
 }
 
 VtkViewer& VtkViewer::operator=(const VtkViewer& vtkViewer){
