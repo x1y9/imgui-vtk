@@ -8,6 +8,7 @@
 ![](vtkImGuiDemo.gif)
 
 ## Usage:
+- Build VTK, if static, set VTK_SMP_ENABLE_STDTHREAD=OFF
 - CMake
   1. Build separately & link
     - Build your executable, imgui, your OpenGL Loader (e.g., gl3w), and imgui-vtk. **Make sure to link imgui-vtk against imgui, your OpenGL Loader (e.g., gl3w), and VTK!**
@@ -18,8 +19,6 @@
 - See `main.cpp`
 
 ## Notes
-- `imgui`, `gl3w`, and `glfw` are included in this repository as git submodules
-  - For integration into an existing project, only `VtkViewer.h` and `VtkViewer.cpp` are needed. However, they will need to be linked with or built alongside Dear ImGui and VTK
 - Dependencies are built separately in `CMakeLists.txt` then linked together as static libraries
   - `CMakeLists-alt.txt` builds everything together from source
 - Usage (see [`main.cpp`](main.cpp) for details)
