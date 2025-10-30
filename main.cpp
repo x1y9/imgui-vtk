@@ -110,6 +110,27 @@ int main(int argc, char* argv[])
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+     // Create a fullscreen dockspace
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | 
+                                     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | 
+                                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | 
+                                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+    
+    ImGui::Begin("DockSpace", nullptr, window_flags);
+    ImGui::PopStyleVar(3);
+    
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::End();
+    
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (show_demo_window){
       ImGui::ShowDemoWindow(&show_demo_window);
