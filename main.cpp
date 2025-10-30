@@ -15,6 +15,11 @@
 #include "imgui_impl_opengl3.h"
 #include "VtkViewer.h"
 
+// remove console for release build
+#if defined(_WIN32) && defined(NDEBUG)
+    #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#endif
+
 // VTK
 #include <vtkSmartPointer.h>
 #include <vtkActor.h>
