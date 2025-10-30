@@ -97,10 +97,25 @@ int main(int argc, char* argv[])
   bool show_another_window = false;
   bool vtk_1_open = true;
   bool vtk_2_open = true;
+  bool chart_window_open = true;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+  // Chart data for performance testing
+  const int num_charts = 10;
+  const int data_points = 10000;
+  static float chart_data[num_charts][data_points];
+  
+  // Initialize chart data with sine waves
+  for (int chart = 0; chart < num_charts; chart++) {
+    for (int i = 0; i < data_points; i++) {
+      float phase = (float)chart * 0.5f;
+      chart_data[chart][i] = sinf(i * 0.05f + phase) * (chart + 1) * 10.0f;
+    }
+  }
+
   // Main loop
-  while (!glfwWindowShouldClose(window))
+  int count = 0;
+  while (!glfwWindowShouldClose(window) && ++count)
   {
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -150,6 +165,7 @@ int main(int argc, char* argv[])
       ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
       ImGui::Checkbox("Another Window", &show_another_window);
       ImGui::Checkbox("VTK Viewer #2", &vtk_2_open);
+      ImGui::Checkbox("Chart Window", &chart_window_open);
 
       ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
       ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -214,6 +230,29 @@ int main(int argc, char* argv[])
       renderer->SetBackgroundAlpha(vtk2BkgAlpha);
 
       vtkViewer2.render();
+      ImGui::End();
+    }
+
+    // 6. Show Chart Window for Performance Testing
+    if (chart_window_open) {
+      ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
+      ImGui::Begin("chart", &chart_window_open);      
+      ImGui::Text("Lines:%d,%d points per line", num_charts, data_points);
+      ImGui::Separator();
+      
+      // Draw multiple charts
+      ImVec2 chart_size = ImVec2(ImGui::GetContentRegionAvail().x, 150);
+      for (int chart = 0; chart < num_charts; chart++) {
+        char label[64];
+        sprintf(label, "chart #%d", chart + 1);
+        
+        float min_val = -(chart + 1) * 10.0f - 5.0f;
+        float max_val = (chart + 1) * 10.0f + 5.0f;
+        
+        ImGui::PlotLines(label, chart_data[chart], data_points, count, NULL, 
+                        min_val, max_val, chart_size);
+      }
+      
       ImGui::End();
     }
 
