@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(1); // Enable vsync
+  glfwSwapInterval(0); // Disable vsync
 
   // Initialize OpenGL loader
   if (gl3wInit() != 0){
@@ -74,7 +74,6 @@ int main(int argc, char* argv[])
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-  // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows'
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
@@ -96,6 +95,7 @@ int main(int argc, char* argv[])
   // Our state
   bool show_demo_window = true;
   bool show_another_window = false;
+  bool vtk_1_open = true;
   bool vtk_2_open = true;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -174,12 +174,14 @@ int main(int argc, char* argv[])
       ImGui::End();
     }
 
-    // 4. Show a simple VtkViewer Instance (Always Open)
+    // 4. Show a simple VtkViewer Instance
     ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Vtk Viewer 1", nullptr, VtkViewer::NoScrollFlags());
-    vtkViewer1.render(); // default render size = ImGui::GetContentRegionAvail()
-    ImGui::End();
-
+    if (vtk_1_open) {
+        ImGui::Begin("Vtk Viewer 1", &vtk_1_open, VtkViewer::NoScrollFlags());
+        vtkViewer1.render(); // default render size = ImGui::GetContentRegionAvail()
+        ImGui::End();
+    }
+    
     // 5. Show a more complex VtkViewer Instance (Closable, Widgets in Window)
     ImGui::SetNextWindowSize(ImVec2(720, 480), ImGuiCond_FirstUseEver);
     if (vtk_2_open){
@@ -212,7 +214,6 @@ int main(int argc, char* argv[])
       renderer->SetBackgroundAlpha(vtk2BkgAlpha);
 
       vtkViewer2.render();
-
       ImGui::End();
     }
 
@@ -223,16 +224,6 @@ int main(int argc, char* argv[])
     glViewport(0, 0, display_w, display_h);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    // Update and Render additional Platform Windows
-    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    // {
-    //     GLFWwindow* backup_current_context = glfwGetCurrentContext();
-    //     ImGui::UpdatePlatformWindows();
-    //     ImGui::RenderPlatformWindowsDefault();
-    //     glfwMakeContextCurrent(backup_current_context);
-    // }
-
     glfwSwapBuffers(window);
   }
 
