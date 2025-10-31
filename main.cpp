@@ -9,8 +9,9 @@
 // Include glfw3.h after our OpenGL definitions
 #include <GLFW/glfw3.h>
 
-// ImGui + imgui-vtk
+// ImGui + imgui-vtk, some flags need internal.h
 #include "imgui.h"
+#include "imgui_internal.h"  
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "VtkViewer.h"
@@ -190,8 +191,11 @@ int main(int argc, char* argv[])
       ImGui::End();
     }
 
-    // 4. Show a simple VtkViewer Instance
+    // Show a simple VtkViewer Instance and disable docking to this window
     ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+    ImGuiWindowClass vtkViewClass;
+    vtkViewClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoDockingOverMe;
+    ImGui::SetNextWindowClass(&vtkViewClass);
     if (vtk_1_open) {
         ImGui::Begin("Vtk Viewer 1", &vtk_1_open, VtkViewer::NoScrollFlags());
         vtkViewer1.render(); // default render size = ImGui::GetContentRegionAvail()
@@ -200,6 +204,7 @@ int main(int argc, char* argv[])
     
     // 5. Show a more complex VtkViewer Instance (Closable, Widgets in Window)
     ImGui::SetNextWindowSize(ImVec2(720, 480), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowClass(&vtkViewClass);
     if (vtk_2_open){
       ImGui::Begin("Vtk Viewer 2", &vtk_2_open, VtkViewer::NoScrollFlags());
 
