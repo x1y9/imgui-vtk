@@ -14,7 +14,15 @@ endif()
 # In this CMakeLists.txt file, components are all built separately and linked together
 # If you prefer to compile source files + dependencies (OpenGL loaders, imgui, VtkViewer, etc.)
 # together, please see CMakeLists-alt.txt
-add_executable(${EXEC_NAME} main.cpp)
+add_executable(${EXEC_NAME} 
+  main.cpp
+  HelloWindow.cpp
+  AnotherWindow.cpp
+  VtkViewer1Window.cpp
+  VtkViewer2Window.cpp
+  ChartWindow.cpp
+  TableWindow.cpp
+)
 
 # OpenGL
 find_package(OpenGL REQUIRED)
