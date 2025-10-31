@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
   bool vtk_2_open = true;
   bool chart_window_open = true;
   bool table_window_open = true;
+  bool enable_vsync = false; // VSync开关
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Main loop
@@ -148,6 +149,15 @@ int main(int argc, char* argv[])
 
     helloWindow.render(show_demo_window, show_another_window, vtk_2_open, 
                        chart_window_open, table_window_open, clear_color);
+    
+    // VSync控制面板
+    ImGui::Begin("Performance Settings");
+    if (ImGui::Checkbox("Enable VSync", &enable_vsync)) {
+      glfwSwapInterval(enable_vsync ? 1 : 0);
+    }
+    ImGui::Text("FPS: %.1f", io.Framerate);
+    ImGui::Text("Frame Time: %.3f ms", 1000.0f / io.Framerate);
+    ImGui::End();
 
     if (show_another_window){
       anotherWindow.render(show_another_window);
