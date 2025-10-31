@@ -7,6 +7,10 @@ set(APP_VERSION_MAJOR 1)
 set(APP_VERSION_MINOR 0)
 set(EXEC_NAME imgui_vtk)
 
+if(MSVC)
+  add_compile_options(/utf-8)
+endif()
+
 # In this CMakeLists.txt file, components are all built separately and linked together
 # If you prefer to compile source files + dependencies (OpenGL loaders, imgui, VtkViewer, etc.)
 # together, please see CMakeLists-alt.txt
