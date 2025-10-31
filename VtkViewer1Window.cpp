@@ -1,4 +1,5 @@
 #include "VtkViewer1Window.h"
+#include "Localization.h"
 
 VtkViewer1Window::VtkViewer1Window() {}
 
@@ -13,7 +14,7 @@ void VtkViewer1Window::render(bool& vtk_1_open) {
     ImGui::SetNextWindowClass(&vtkViewClass);
     
     if (vtk_1_open) {
-        ImGui::Begin("Vtk Viewer 1", &vtk_1_open, VtkViewer::NoScrollFlags());
+        ImGui::Begin(TR("window.vtk1"), &vtk_1_open, VtkViewer::NoScrollFlags());
         vtkViewer.render();
         ImGui::End();
     }

@@ -20,6 +20,7 @@
 #include "VtkViewer2Window.h"
 #include "ChartWindow.h"
 #include "TableWindow.h"
+#include "Localization.h"
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -85,6 +86,9 @@ int main(int argc, char* argv[])
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
   io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 22.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
+
+  // 初始化本地化系统（自动检测系统语言）
+  Localization::getInstance(); // 会自动调用detectSystemLanguage()
 
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -155,12 +159,26 @@ int main(int argc, char* argv[])
                        chart_window_open, table_window_open, clear_color);
     
     // VSync控制面板
-    ImGui::Begin("Performance Settings");
-    if (ImGui::Checkbox("Enable VSync", &enable_vsync)) {
+    ImGui::Begin(TR("window.performance"));
+    
+    // 语言切换菜单
+    if (ImGui::BeginMenu(TR("menu.language"))) {
+      if (ImGui::MenuItem("English", nullptr, Localization::getInstance().getLanguage() == Language::English)) {
+        Localization::getInstance().setLanguage(Language::English);
+      }
+      if (ImGui::MenuItem("中文", nullptr, Localization::getInstance().getLanguage() == Language::Chinese)) {
+        Localization::getInstance().setLanguage(Language::Chinese);
+      }
+      ImGui::EndMenu();
+    }
+    
+    ImGui::Separator();
+    
+    if (ImGui::Checkbox(TR("perf.vsync"), &enable_vsync)) {
       glfwSwapInterval(enable_vsync ? 1 : 0);
     }
-    ImGui::Text("FPS: %.1f", io.Framerate);
-    ImGui::Text("Frame Time: %.3f ms", 1000.0f / io.Framerate);
+    ImGui::Text("%s: %.1f", TR("perf.fps"), io.Framerate);
+    ImGui::Text("%s: %.3f ms", TR("perf.frametime"), 1000.0f / io.Framerate);
     ImGui::End();
 
     if (show_another_window){

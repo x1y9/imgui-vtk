@@ -22,6 +22,7 @@ add_executable(${EXEC_NAME}
   VtkViewer2Window.cpp
   ChartWindow.cpp
   TableWindow.cpp
+  Localization.cpp
 )
 
 # OpenGL
