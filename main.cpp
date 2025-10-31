@@ -59,7 +59,10 @@ int main(int argc, char* argv[])
   const char* glsl_version = "#version 130";
 #endif
 
-  // Create window with graphics context
+  // 获取主显示器和全屏模式（独占全屏，会遮挡任务栏）
+  // GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  // const GLFWvidmode* mode = glfwGetVideoMode(monitor);，传入 monitor 参数)
+  // GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "Dear ImGui VTKViewer Example", monitor, NULL);
   GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui VTKViewer Example", NULL, NULL);
   if (window == NULL){
     return 1;
