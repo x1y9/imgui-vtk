@@ -46,6 +46,7 @@ private:
 	unsigned int viewportWidth, viewportHeight;
 	unsigned int tex;
 	bool firstRender;
+	bool needsRender;  // 脏标记：是否需要重新渲染
 public:
 	VtkViewer();
 	VtkViewer(const VtkViewer& vtkViewer);
@@ -63,6 +64,7 @@ public:
 	IMGUI_IMPL_API void removeActor(const vtkSmartPointer<vtkProp>& actor);
 	IMGUI_IMPL_API void cleanup();
 	void setViewportSize(const ImVec2 newSize);
+	inline void markDirty() { needsRender = true; }  // 标记需要重新渲染
 public:
 	static inline unsigned int NoScrollFlags(){
 		return ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;

@@ -59,32 +59,42 @@ void VtkViewer::processEvents(){
 	if (ImGui::IsWindowHovered()){
 		if (io.MouseClicked[ImGuiMouseButton_Left]){
 			interactor->InvokeEvent(vtkCommand::LeftButtonPressEvent, nullptr);
+			needsRender = true;  // 交互时标记需要渲染
 		}
 		else if (io.MouseClicked[ImGuiMouseButton_Right]){
 			interactor->InvokeEvent(vtkCommand::RightButtonPressEvent, nullptr);
 			ImGui::SetWindowFocus(); // make right-clicks bring window into focus
+			needsRender = true;
 		}
 		else if (io.MouseWheel > 0){
 			interactor->InvokeEvent(vtkCommand::MouseWheelForwardEvent, nullptr);
+			needsRender = true;
 		}
 		else if (io.MouseWheel < 0){
 			interactor->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, nullptr);
+			needsRender = true;
 		}
 	}
 
 	if (io.MouseReleased[ImGuiMouseButton_Left]){
 		interactor->InvokeEvent(vtkCommand::LeftButtonReleaseEvent, nullptr);
+		needsRender = true;
 	}
 	else if (io.MouseReleased[ImGuiMouseButton_Right]){
 		interactor->InvokeEvent(vtkCommand::RightButtonReleaseEvent, nullptr);
+		needsRender = true;
 	}
 
-	interactor->InvokeEvent(vtkCommand::MouseMoveEvent, nullptr);
+	// 鼠标移动时也需要渲染（拖拽旋转等）
+	if (io.MouseDown[ImGuiMouseButton_Left] || io.MouseDown[ImGuiMouseButton_Right]) {
+		interactor->InvokeEvent(vtkCommand::MouseMoveEvent, nullptr);
+		needsRender = true;
+	}
 }
 
 VtkViewer::VtkViewer() 
 	: viewportWidth(0), viewportHeight(0), renderWindow(nullptr), interactor(nullptr), interactorStyle(nullptr),
-	renderer(nullptr), tex(0), firstRender(true){
+	renderer(nullptr), tex(0), firstRender(true), needsRender(true){
 	init();
 }
 
@@ -189,9 +199,13 @@ void VtkViewer::render(){
 void VtkViewer::render(const ImVec2 size){
 	setViewportSize(size);
 
-	renderWindow->Render();
-	// 移除 WaitForCompletion() 以避免阻塞，让GPU异步渲染
-	// renderWindow->WaitForCompletion();
+	// 只在需要时渲染VTK场景
+	if (needsRender) {
+		renderWindow->Render();
+		needsRender = false;
+		// 不要等待GPU完成，让它异步执行
+		// renderWindow->WaitForCompletion();
+	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
 	ImGui::BeginChild("##Viewport", size, true, VtkViewer::NoScrollFlags());
@@ -204,6 +218,7 @@ void VtkViewer::render(const ImVec2 size){
 void VtkViewer::addActor(const vtkSmartPointer<vtkProp>& actor){
 	renderer->AddActor(actor);
 	renderer->ResetCamera();
+	needsRender = true;  // 添加Actor后需要重新渲染
 }
 
 void VtkViewer::addActors(const vtkSmartPointer<vtkPropCollection>& actors){
@@ -254,4 +269,5 @@ void VtkViewer::setViewportSize(const ImVec2 newSize){
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	firstRender = false;
+	needsRender = true;  // 窗口大小改变后需要重新渲染
 }
