@@ -190,7 +190,8 @@ void VtkViewer::render(const ImVec2 size){
 	setViewportSize(size);
 
 	renderWindow->Render();
-	renderWindow->WaitForCompletion();
+	// 移除 WaitForCompletion() 以避免阻塞，让GPU异步渲染
+	// renderWindow->WaitForCompletion();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
 	ImGui::BeginChild("##Viewport", size, true, VtkViewer::NoScrollFlags());

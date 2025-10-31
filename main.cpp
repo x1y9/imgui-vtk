@@ -87,16 +87,17 @@ int main(int argc, char* argv[])
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
 
-  // Initialize VTK actor
-  auto actor = SetupDemoPipeline();
+  // 完全独立的pipeline，避免共享导致的性能劣化
+  auto actor1 = SetupDemoPipeline();
+  auto actor2 = SetupDemoPipeline();
 
   // Initialize window objects
   HelloWindow helloWindow;
   AnotherWindow anotherWindow;
   VtkViewer1Window vtkViewer1Window;
-  vtkViewer1Window.addActor(actor);
+  vtkViewer1Window.addActor(actor1);
   VtkViewer2Window vtkViewer2Window;
-  vtkViewer2Window.addActor(actor);
+  vtkViewer2Window.addActor(actor2);
   ChartWindow chartWindow;
   TableWindow tableWindow;
 
