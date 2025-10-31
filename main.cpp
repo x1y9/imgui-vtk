@@ -1,5 +1,7 @@
 // Standard Library
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 // OpenGL Loader
 // This can be replaced with another loader, e.g. glad, but
@@ -99,6 +101,7 @@ int main(int argc, char* argv[])
   bool vtk_1_open = true;
   bool vtk_2_open = true;
   bool chart_window_open = true;
+  bool table_window_open = true;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Chart data for performance testing
@@ -113,6 +116,29 @@ int main(int argc, char* argv[])
       chart_data[chart][i] = sinf(i * 0.05f + phase) * (chart + 1) * 10.0f;
     }
   }
+
+  // Table data - 10000 rows, 4 columns
+  struct TableRow {
+    int id;
+    char name[32];
+    float value;
+    int status;
+  };
+  
+  static std::vector<TableRow> table_data;
+  table_data.reserve(10000);
+  for (int i = 0; i < 10000; i++) {
+    TableRow row;
+    row.id = i + 1;
+    sprintf(row.name, "Project %d", i + 1);
+    row.value = (float)(rand() % 10000) / 100.0f;
+    row.status = rand() % 5;
+    table_data.push_back(row);
+  }
+  
+  // Sorting state
+  static int sort_column = 0;
+  static bool sort_ascending = true;
 
   // Main loop
   int count = 0;
@@ -167,6 +193,7 @@ int main(int argc, char* argv[])
       ImGui::Checkbox("Another Window", &show_another_window);
       ImGui::Checkbox("VTK Viewer #2", &vtk_2_open);
       ImGui::Checkbox("Chart Window", &chart_window_open);
+      ImGui::Checkbox("Table Window", &table_window_open);
 
       ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
       ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -256,6 +283,86 @@ int main(int argc, char* argv[])
         
         ImGui::PlotLines(label, chart_data[chart], data_points, count, NULL, 
                         min_val, max_val, chart_size);
+      }
+      
+      ImGui::End();
+    }
+
+    // 7. Show Table Window with 10000 rows and 4 columns
+    if (table_window_open) {
+      ImGui::SetNextWindowSize(ImVec2(900, 600), ImGuiCond_FirstUseEver);
+      ImGui::Begin("Grid", &table_window_open);
+      
+      ImGui::Text("Lines: %d", (int)table_data.size());
+      ImGui::Separator();
+      
+      // Table with sorting and reorderable columns
+      ImGuiTableFlags flags = ImGuiTableFlags_Sortable | 
+                              ImGuiTableFlags_Reorderable | 
+                              ImGuiTableFlags_Resizable |
+                              ImGuiTableFlags_ScrollY | 
+                              ImGuiTableFlags_RowBg | 
+                              ImGuiTableFlags_BordersOuter | 
+                              ImGuiTableFlags_BordersV;
+      
+      if (ImGui::BeginTable("DataTable", 4, flags, ImVec2(0.0f, 0.0f))) {
+        // Setup columns
+        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthFixed, 80.0f, 0);
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 200.0f, 1);
+        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, 150.0f, 2);
+        ImGui::TableSetupColumn("Status", ImGuiTableColumnFlags_WidthFixed, 100.0f, 3);
+        ImGui::TableSetupScrollFreeze(0, 1); // Freeze header row
+        ImGui::TableHeadersRow();
+        
+        // Handle sorting
+        if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs()) {
+          if (sort_specs->SpecsDirty) {
+            if (sort_specs->SpecsCount > 0) {
+              const ImGuiTableColumnSortSpecs& spec = sort_specs->Specs[0];
+              sort_column = spec.ColumnUserID;
+              sort_ascending = (spec.SortDirection == ImGuiSortDirection_Ascending);
+              
+              // Sort the data
+              std::sort(table_data.begin(), table_data.end(), [](const TableRow& a, const TableRow& b) {
+                switch (sort_column) {
+                  case 0: return sort_ascending ? (a.id < b.id) : (a.id > b.id);
+                  case 1: {
+                    int cmp = strcmp(a.name, b.name);
+                    return sort_ascending ? (cmp < 0) : (cmp > 0);
+                  }
+                  case 2: return sort_ascending ? (a.value < b.value) : (a.value > b.value);
+                  case 3: return sort_ascending ? (a.status < b.status) : (a.status > b.status);
+                  default: return false;
+                }
+              });
+            }
+            sort_specs->SpecsDirty = false;
+          }
+        }
+        
+        // Display rows
+        ImGuiListClipper clipper;
+        clipper.Begin((int)table_data.size());
+        while (clipper.Step()) {
+          for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
+            ImGui::TableNextRow();
+            
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%d", table_data[row].id);
+            
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s", table_data[row].name);
+            
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text("%.2f", table_data[row].value);
+            
+            ImGui::TableSetColumnIndex(3);
+            const char* status_text[] = {"待处理", "进行中", "已完成", "已取消", "错误"};
+            ImGui::Text("%s", status_text[table_data[row].status]);
+          }
+        }
+        
+        ImGui::EndTable();
       }
       
       ImGui::End();
