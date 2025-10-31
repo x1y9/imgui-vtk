@@ -18,6 +18,7 @@ add_executable(${EXEC_NAME}
   main.cpp
   HelloWindow.cpp
   AnotherWindow.cpp
+  VtkViewer.cpp
   VtkViewer1Window.cpp
   VtkViewer2Window.cpp
   ChartWindow.cpp
@@ -98,14 +99,8 @@ else()
 endif()
 message (STATUS "VTK Version: ${VTK_VERSION}")
 
-# imgui-vtk (VTK Viewer class)
-set(imgui_vtk_viewer_dir ${CMAKE_CURRENT_SOURCE_DIR})
-add_library(imgui_vtk_viewer STATIC ${imgui_vtk_viewer_dir}/VtkViewer.cpp)
-target_include_directories(imgui_vtk_viewer PUBLIC ${imgui_vtk_viewer_dir})
-target_link_libraries(imgui_vtk_viewer gl3w) # Since gl3w was compiled as a static library, we need to link to it
-target_link_libraries(imgui_vtk_viewer imgui) # Since imgui was compiled as a static library, we need to link to it
-target_link_libraries(imgui_vtk_viewer ${VTK_LIBRARIES})
-target_link_libraries(${EXEC_NAME} imgui_vtk_viewer)
+# Link VTK libraries directly to main executable
+target_link_libraries(${EXEC_NAME} ${VTK_LIBRARIES})
 
 # GLFW is built from source in this example
 # But if you link dynamically, you may need to link some native libraries on macOS:
