@@ -357,7 +357,11 @@ int main(int argc, char* argv[])
             
             ImGui::TableSetColumnIndex(2);
             ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::InputFloat("##value", &table_data[row].value, 0.0f, 0.0f, "%.2f");
+            //用##value和上面的PushID构成唯一id
+            if (ImGui::InputFloat("##value", &table_data[row].value, 0.0f, 0.0f, "%.2f")) {
+              if (table_data[row].value < 0.0f) table_data[row].value = 0.0f;
+              if (table_data[row].value > 100.0f) table_data[row].value = 100.0f;
+            }
             
             ImGui::TableSetColumnIndex(3);
             const char* status_text[] = {"待处理", "进行中", "已完成", "已取消", "错误"};
