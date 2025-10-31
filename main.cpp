@@ -346,6 +346,8 @@ int main(int argc, char* argv[])
         while (clipper.Step()) {
           for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
             ImGui::TableNextRow();
+            //可编辑的控件必须要有window下的唯一id
+            ImGui::PushID(row);
             
             ImGui::TableSetColumnIndex(0);
             ImGui::Text("%d", table_data[row].id);
@@ -354,11 +356,14 @@ int main(int argc, char* argv[])
             ImGui::Text("%s", table_data[row].name);
             
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%.2f", table_data[row].value);
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            ImGui::InputFloat("##value", &table_data[row].value, 0.0f, 0.0f, "%.2f");
             
             ImGui::TableSetColumnIndex(3);
             const char* status_text[] = {"待处理", "进行中", "已完成", "已取消", "错误"};
             ImGui::Text("%s", status_text[table_data[row].status]);
+            
+            ImGui::PopID();
           }
         }
         
